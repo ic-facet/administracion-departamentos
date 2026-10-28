@@ -22,8 +22,8 @@ class Licencia(BaseModel):
         ('otra', 'Otra'),
     ]
 
-    docente = models.ForeignKey(
-        'Docente', on_delete=models.CASCADE, related_name='licencias')
+    persona = models.ForeignKey(
+        'Persona', on_delete=models.CASCADE, related_name='licencias')
     tipo = models.CharField(max_length=25, choices=TIPO_CHOICES)
     codigo_cargo = models.PositiveIntegerField(
         null=True, blank=True,
@@ -40,9 +40,9 @@ class Licencia(BaseModel):
         related_name='licencias')
     expediente = models.CharField(max_length=100, blank=True, null=True)
     reemplazante = models.ForeignKey(
-        'Docente', on_delete=models.SET_NULL, null=True, blank=True,
+        'Persona', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='reemplazos',
-        help_text='Docente que cubre el cargo durante la licencia, si lo hay.')
+        help_text='Persona que cubre el cargo durante la licencia, si lo hay.')
     observaciones = models.TextField(blank=True, null=True)
     estado = models.CharField(max_length=1, default='1')
 
@@ -57,13 +57,13 @@ class Licencia(BaseModel):
             raise ValidationError({
                 'fecha_fin': 'La fecha de fin no puede ser anterior al inicio.',
             })
-        if self.reemplazante_id and self.reemplazante_id == self.docente_id:
+        if self.reemplazante_id and self.reemplazante_id == self.persona_id:
             raise ValidationError({
-                'reemplazante': 'El reemplazante no puede ser el mismo docente.',
+                'reemplazante': 'El reemplazante no puede ser el misma persona.',
             })
 
     def __str__(self):
-        quien = self.docente.persona.apellido if self.docente_id else '—'
+        quien = self.persona.apellido if self.persona_id else '—'
         return f'{quien} · {self.get_tipo_display()} ({self.fecha_inicio})'
 
     class Meta:

@@ -22,7 +22,7 @@ const EditarSeguimiento = () => {
       .then(({ data }) =>
         setValor({
           ...VACIO,
-          docente: data.docente ?? "",
+          persona: data.persona ?? "",
           tipo: data.tipo ?? "otro",
           descripcion: data.descripcion ?? "",
           fecha_novedad: data.fecha_novedad ?? "",

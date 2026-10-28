@@ -22,7 +22,7 @@ from django.db.models import Model as DjangoModel
 from django.utils import timezone
 
 from departamentos.models import (
-    Persona, Docente, NoDocente, TipoCargo, Cargo, CargoHistorial,
+    Persona, NoDocente, TipoCargo, Cargo, CargoHistorial,
 )
 
 
@@ -106,8 +106,8 @@ class Stats:
             '',
             f'Personas creadas:        {self.personas_creadas}',
             f'Personas existentes:     {self.personas_existentes}',
-            f'Docentes creados:        {self.docentes_creados}',
-            f'NoDocentes creados:      {self.no_docentes_creados}',
+            f'Docentes procesados:      {self.docentes_creados}',
+            f'NoDocentes procesados:    {self.no_docentes_creados}',
             f'TipoCargo creados:       {self.tipo_cargo_creados}',
             f'Cargos creados:          {self.cargos_creados}',
             f'Cargos actualizados:     {self.cargos_actualizados}',
@@ -237,19 +237,18 @@ class Command(BaseCommand):
         agrupamiento = clean_str(row.get('agrupamiento')).upper()
         es_docente = agrupamiento in AGRUPAMIENTOS_DOCENTE
 
+        # No hay modelo Docente: docente es la persona con asignación activa.
         docente = no_docente = None
         if es_docente:
-            docente, created = Docente.objects.get_or_create(
-                persona=persona, defaults={'estado': '1'})
-            if created:
-                stats.docentes_creados += 1
+            docente = persona
+            stats.docentes_creados += 1
         else:
-            # Verificar que no sea ya Docente
-            if Docente.objects.filter(persona=persona).exists():
+            # Verificar que no tenga ya historial como docente
+            if CargoHistorial.objects.filter(persona=persona).exists():
                 stats.advertencias.append(
-                    f'Persona DNI {dni} ya es Docente, no se crea como NoDocente '
+                    f'Persona DNI {dni} ya figura como docente, no se crea como NoDocente '
                     f'aunque el Excel indica agrupamiento "{agrupamiento}".')
-                docente = Docente.objects.get(persona=persona)
+                docente = persona
                 es_docente = True
             else:
                 no_docente, created = NoDocente.objects.get_or_create(
@@ -317,7 +316,7 @@ class Command(BaseCommand):
             'fecha_inicio': fecha_inicio,
         }
         if es_docente:
-            hist_filter['docente'] = docente
+            hist_filter['persona'] = docente
         else:
             hist_filter['no_docente'] = no_docente
 
@@ -330,7 +329,7 @@ class Command(BaseCommand):
             try:
                 ch = CargoHistorial(
                     cargo=cargo,
-                    docente=docente,
+                    persona=docente,
                     no_docente=no_docente,
                     fecha_inicio=fecha_inicio,
                     fecha_fin=fecha_fin,

@@ -2,7 +2,6 @@ from .area import AreaViewSet
 from .asignatura import AsignaturaViewSet
 from .carrera import CarreraViewSet
 from .departamento import DepartamentoViewSet
-from .docente import DocenteViewSet
 from .resolucion import ResolucionViewSet
 from .persona import PersonaViewSet
 from .jefe import JefeViewSet

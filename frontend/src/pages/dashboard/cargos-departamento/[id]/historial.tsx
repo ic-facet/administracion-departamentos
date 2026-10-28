@@ -34,8 +34,8 @@ interface Ocupacion {
   fecha_inicio: string;
   fecha_fin: string | null;
   motivo_fin: string | null;
-  docente_detalle?: { nombre: string; apellido: string; dni: string } | null;
-  no_docente_detalle?: { nombre: string; apellido: string; dni: string } | null;
+  persona_detalle?: { nombre: string; apellido: string; dni: string } | null;
+  no_persona_detalle?: { nombre: string; apellido: string; dni: string } | null;
   vacante: boolean;
   duracion_dias?: number;
 }
@@ -107,7 +107,7 @@ const HistorialCargoDep = () => {
 
   const { cargo_departamento, ocupaciones, nacio_de, finalizo_en } = data;
   const ocupanteName = (o: Ocupacion) => {
-    const d = o.docente_detalle || o.no_docente_detalle;
+    const d = o.persona_detalle || o.no_docente_detalle;
     return d ? `${d.apellido}, ${d.nombre} (DNI ${d.dni})` : null;
   };
 

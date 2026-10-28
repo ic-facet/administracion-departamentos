@@ -102,12 +102,16 @@ const CrearDocenteAsignatura: React.FC = () => {
     email: string;
   }
 
+  // Una persona (cualquiera puede recibir una asignación en asignatura).
   interface Docente {
     id: number;
-    persona: number; // Esto representa solo el ID de la persona
-    persona_detalle: PersonaDetalle | null; // Nuevo campo que contiene los detalles de la persona
-    observaciones: string;
-    estado: 0 | 1;
+    nombre: string;
+    apellido: string;
+    dni: string;
+    legajo: string;
+    telefono: string;
+    email: string;
+    estado: string;
   }
 
   const [personas, setPersonas] = useState<Docente[]>([]);
@@ -125,7 +129,7 @@ const CrearDocenteAsignatura: React.FC = () => {
   const [nextUrlPersonas, setNextUrlPersonas] = useState<string | null>(null);
   const [prevUrlPersonas, setPrevUrlPersonas] = useState<string | null>(null);
   const [currentUrlPersonas, setCurrentUrlPersonas] = useState<string>(
-    `/facet/docente/`
+    `/facet/persona/`
   );
   const [currentPagePersonas, setCurrentPagePersonas] = useState<number>(1);
   const [totalItemsPersonas, setTotalItemsPersonas] = useState<number>(0);
@@ -186,15 +190,15 @@ const CrearDocenteAsignatura: React.FC = () => {
 
   const handleFilterPersonas = (filtro: string) => {
     return personas.filter((docente) => {
-      const dniMatch = docente.persona_detalle?.dni?.includes(filtro) ?? false;
+      const dniMatch = docente.dni?.includes(filtro) ?? false;
       const legajoMatch =
-        docente.persona_detalle?.legajo?.includes(filtro) ?? false;
+        docente.legajo?.includes(filtro) ?? false;
       const nombreMatch =
-        docente.persona_detalle?.nombre
+        docente.nombre
           ?.toLowerCase()
           .includes(filtro.toLowerCase()) ?? false;
       const apellidoMatch =
-        docente.persona_detalle?.apellido
+        docente.apellido
           ?.toLowerCase()
           .includes(filtro.toLowerCase()) ?? false;
       return dniMatch || legajoMatch || nombreMatch || apellidoMatch;
@@ -203,7 +207,7 @@ const CrearDocenteAsignatura: React.FC = () => {
 
   // Función para filtrar docentes desde el servidor
   const filtrarDocentes = () => {
-    let url = `/facet/docente/?`;
+    let url = `/facet/persona/?`;
     const params = new URLSearchParams();
 
     if (filtroDni.trim()) {
@@ -377,7 +381,7 @@ const CrearDocenteAsignatura: React.FC = () => {
 
     const nuevoDocenteAsignatura = {
       asignatura: idAsignatura,
-      docente: persona.id,
+      persona: persona.id,
       resolucion: resolucion.id,
       observaciones: observaciones,
       estado: estado,
@@ -434,8 +438,8 @@ const CrearDocenteAsignatura: React.FC = () => {
             onClick={handleOpenPersona}
             selectedLabel="Docente"
             selectedValue={
-              persona?.persona_detalle
-                ? `${persona.persona_detalle.nombre} ${persona.persona_detalle.apellido}`
+              persona
+                ? `${persona.nombre} ${persona.apellido}`
                 : undefined
             }
           />
@@ -567,7 +571,7 @@ const CrearDocenteAsignatura: React.FC = () => {
                 <button
                   onClick={() => {
                     setFiltroDni("");
-                    fetchDataPersonas(`/facet/docente/`);
+                    fetchDataPersonas(`/facet/persona/`);
                   }}
                   className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-500 transition-colors duration-200 px-2 py-1 rounded-lg hover:bg-red-50"
                 >
@@ -626,16 +630,16 @@ const CrearDocenteAsignatura: React.FC = () => {
                     key={docente.id}
                     className="hover:bg-blue-50 transition-colors duration-200">
                     <TableCell className="font-medium py-2">
-                      {docente.persona_detalle?.dni || "N/A"}
+                      {docente.dni || "N/A"}
                     </TableCell>
                     <TableCell className="font-medium py-2">
-                      {docente.persona_detalle?.nombre || "N/A"}
+                      {docente.nombre || "N/A"}
                     </TableCell>
                     <TableCell className="font-medium py-2">
-                      {docente.persona_detalle?.apellido || "N/A"}
+                      {docente.apellido || "N/A"}
                     </TableCell>
                     <TableCell className="font-medium py-2">
-                      {docente.persona_detalle?.legajo || "N/A"}
+                      {docente.legajo || "N/A"}
                     </TableCell>
                     <TableCell className="py-2">
                       <button

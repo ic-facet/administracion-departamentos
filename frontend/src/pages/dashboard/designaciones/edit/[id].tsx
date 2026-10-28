@@ -22,7 +22,7 @@ const EditarDesignacion = () => {
       .then(({ data }) =>
         setValor({
           ...VACIO,
-          docente: data.docente ?? "",
+          persona: data.persona ?? "",
           tipo: data.tipo ?? "DI_GENUINO",
           tipo_cargo: data.tipo_cargo ?? "",
           codigo_cargo: data.codigo_cargo ?? "",

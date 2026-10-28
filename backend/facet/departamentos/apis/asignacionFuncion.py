@@ -19,7 +19,7 @@ class AsignacionFuncionViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = {
         'estado': ['exact'],
-        'docente': ['exact'],
+        'persona': ['exact'],
         'departamento': ['exact'],
         'area': ['exact'],
         'fecha_desde': ['exact', 'gte', 'lte'],
@@ -27,13 +27,13 @@ class AsignacionFuncionViewSet(viewsets.ModelViewSet):
     }
     search_fields = [
         'descripcion', 'expediente',
-        'docente__persona__apellido', 'docente__persona__nombre',
+        'persona__apellido', 'persona__nombre',
     ]
     ordering_fields = ['descripcion', 'fecha_desde']
 
     def get_queryset(self):
         qs = AsignacionFuncion.objects.select_related(
-            'docente__persona', 'departamento', 'area', 'resolucion').all()
+            'persona', 'departamento', 'area', 'resolucion').all()
         params = self.request.query_params
         if params.get('show_all', False):
             return qs

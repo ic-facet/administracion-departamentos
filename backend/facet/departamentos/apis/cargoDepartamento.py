@@ -206,7 +206,7 @@ class CargoDepartamentoViewSet(viewsets.ModelViewSet):
     def historial(self, request, pk=None):
         cargo_dep = self.get_object()
         ocupaciones_qs = cargo_dep.historial.select_related(
-            'docente__persona', 'no_docente__persona', 'resolucion'
+            'persona', 'no_docente__persona', 'resolucion'
         ).filter(estado='1').order_by('fecha_inicio')
         ocupaciones = CargoHistorialDetailSerializer(ocupaciones_qs, many=True).data
 

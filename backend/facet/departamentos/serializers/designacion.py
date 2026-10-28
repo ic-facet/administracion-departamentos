@@ -11,7 +11,7 @@ class DesignacionSerializer(serializers.ModelSerializer):
     """
 
     tipo_display = serializers.CharField(source='get_tipo_display', read_only=True)
-    docente_detalle = serializers.SerializerMethodField()
+    persona_detalle = serializers.SerializerMethodField()
     tipo_cargo_detalle = serializers.SerializerMethodField()
     asignatura_detalle = serializers.SerializerMethodField()
     area_detalle = serializers.SerializerMethodField()
@@ -23,7 +23,7 @@ class DesignacionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Designacion
         fields = [
-            'id', 'docente', 'docente_detalle',
+            'id', 'persona', 'persona_detalle',
             'tipo', 'tipo_display',
             'cargo_departamento',
             'tipo_cargo', 'tipo_cargo_detalle', 'codigo_cargo',
@@ -40,12 +40,12 @@ class DesignacionSerializer(serializers.ModelSerializer):
         read_only_fields = ['fecha_creacion', 'fecha_modificacion']
 
     # ---- detalles anidados ----
-    def get_docente_detalle(self, obj):
-        if not obj.docente_id:
+    def get_persona_detalle(self, obj):
+        if not obj.persona_id:
             return None
-        p = obj.docente.persona
+        p = obj.persona
         return {
-            'id': obj.docente.id,
+            'id': p.id,
             'nombre': p.nombre,
             'apellido': p.apellido,
             'dni': p.dni,

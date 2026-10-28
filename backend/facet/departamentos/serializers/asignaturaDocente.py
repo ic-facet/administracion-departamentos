@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from ..models import AsignaturaDocente, Docente, Asignatura, Resolucion, CargoDepartamento
-from .docente import DocenteSerializer
+from ..models import AsignaturaDocente, Persona, Asignatura, Resolucion, CargoDepartamento
+from .persona import PersonaSerializer
 from .resolucion import ResolucionSerializer
 from .asignatura import AsignaturaSerializer
 
@@ -10,7 +10,7 @@ class AsignaturaDocenteSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AsignaturaDocenteCreateSerializer(serializers.ModelSerializer):
-    docente = serializers.PrimaryKeyRelatedField(queryset=Docente.objects.all())
+    persona = serializers.PrimaryKeyRelatedField(queryset=Persona.objects.all())
     asignatura = serializers.PrimaryKeyRelatedField(queryset=Asignatura.objects.all())
     resolucion = serializers.PrimaryKeyRelatedField(queryset=Resolucion.objects.all())
     cargo_departamento = serializers.PrimaryKeyRelatedField(
@@ -21,7 +21,7 @@ class AsignaturaDocenteCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AsignaturaDocenteDetailSerializer(serializers.ModelSerializer):
-    docente = DocenteSerializer()
+    persona = PersonaSerializer()
     asignatura = AsignaturaSerializer()
     resolucion = ResolucionSerializer()
 

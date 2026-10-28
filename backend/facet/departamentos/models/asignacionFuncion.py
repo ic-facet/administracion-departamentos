@@ -12,8 +12,8 @@ class AsignacionFuncion(BaseModel):
     de gestión: es una responsabilidad extra asignada por resolución.
     """
 
-    docente = models.ForeignKey(
-        'Docente', on_delete=models.CASCADE, related_name='funciones')
+    persona = models.ForeignKey(
+        'Persona', on_delete=models.CASCADE, related_name='funciones')
     descripcion = models.CharField(
         max_length=200,
         help_text='Función asignada, ej. "Laboratorio de Telecomunicaciones".')
@@ -40,7 +40,7 @@ class AsignacionFuncion(BaseModel):
             })
 
     def __str__(self):
-        quien = self.docente.persona.apellido if self.docente_id else '—'
+        quien = self.persona.apellido if self.persona_id else '—'
         return f'{quien} · {self.descripcion}'
 
     class Meta:

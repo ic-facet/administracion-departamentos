@@ -23,20 +23,20 @@ class LicenciaViewSet(viewsets.ModelViewSet):
     filterset_fields = {
         'estado': ['exact'],
         'tipo': ['exact', 'in'],
-        'docente': ['exact'],
+        'persona': ['exact'],
         'reemplazante': ['exact', 'isnull'],
         'codigo_cargo': ['exact'],
         'fecha_inicio': ['exact', 'gte', 'lte'],
         'fecha_fin': ['exact', 'gte', 'lte', 'isnull'],
     }
     search_fields = [
-        'docente__persona__apellido', 'docente__persona__nombre', 'expediente',
+        'persona__apellido', 'persona__nombre', 'expediente',
     ]
     ordering_fields = ['fecha_inicio', 'fecha_fin', 'tipo']
 
     def get_queryset(self):
         qs = Licencia.objects.select_related(
-            'docente__persona', 'reemplazante__persona',
+            'persona', 'reemplazante__persona',
             'resolucion', 'cargo_departamento',
         ).all()
 

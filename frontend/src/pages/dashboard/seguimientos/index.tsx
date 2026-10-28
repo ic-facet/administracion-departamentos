@@ -23,7 +23,7 @@ import { TIPOS, ESTADOS_SEG } from "@/components/Seguimientos/SeguimientoForm";
 
 interface Seguimiento {
   id: number;
-  docente_detalle: { apellido: string; nombre: string; dni: string } | null;
+  persona_detalle: { apellido: string; nombre: string; dni: string } | null;
   tipo_display: string;
   descripcion: string;
   fecha_novedad: string;
@@ -181,7 +181,7 @@ const ListaSeguimientos = () => {
           <ResponsiveTable dense>
             <TableHead>
               <TableRow>
-                <TableCell>Docente</TableCell>
+                <TableCell>Persona</TableCell>
                 <TableCell>Tipo</TableCell>
                 <TableCell>Novedad</TableCell>
                 <TableCell>Fecha</TableCell>
@@ -204,8 +204,8 @@ const ListaSeguimientos = () => {
               {items.map((s) => (
                 <TableRow key={s.id} hover>
                   <TableCell>
-                    {s.docente_detalle
-                      ? `${s.docente_detalle.apellido}, ${s.docente_detalle.nombre}`
+                    {s.persona_detalle
+                      ? `${s.persona_detalle.apellido}, ${s.persona_detalle.nombre}`
                       : "—"}
                   </TableCell>
                   <TableCell>{s.tipo_display}</TableCell>

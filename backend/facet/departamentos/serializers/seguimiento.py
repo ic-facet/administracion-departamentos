@@ -10,12 +10,12 @@ class SeguimientoSerializer(serializers.ModelSerializer):
     prioridad_display = serializers.CharField(
         source='get_prioridad_display', read_only=True)
     abierto = serializers.BooleanField(read_only=True)
-    docente_detalle = serializers.SerializerMethodField()
+    persona_detalle = serializers.SerializerMethodField()
 
     class Meta:
         model = Seguimiento
         fields = [
-            'id', 'docente', 'docente_detalle',
+            'id', 'persona', 'persona_detalle',
             'tipo', 'tipo_display', 'descripcion',
             'fecha_novedad', 'fecha_resolucion', 'responsable',
             'prioridad', 'prioridad_display',
@@ -25,12 +25,12 @@ class SeguimientoSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['fecha_creacion', 'fecha_modificacion']
 
-    def get_docente_detalle(self, obj):
-        if not obj.docente_id:
+    def get_persona_detalle(self, obj):
+        if not obj.persona_id:
             return None
-        p = obj.docente.persona
+        p = obj.persona
         return {
-            'id': obj.docente.id,
+            'id': p.id,
             'nombre': p.nombre,
             'apellido': p.apellido,
             'dni': p.dni,

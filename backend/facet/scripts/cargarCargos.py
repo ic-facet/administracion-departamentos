@@ -216,9 +216,6 @@ def cargar_historial(cur, df_cargos, dry_run, now):
     cur.execute("SELECT id, legajo FROM departamentos_persona WHERE legajo IS NOT NULL")
     legajo_to_persona = {l: i for (i, l) in cur.fetchall()}
 
-    cur.execute("SELECT id, persona_id FROM departamentos_docente WHERE estado IN ('1', 'true')")
-    persona_to_docente = {p: i for (i, p) in cur.fetchall()}
-
     cur.execute("SELECT id, persona_id FROM departamentos_nodocente WHERE estado IN ('1', 'true')")
     persona_to_nodocente = {p: i for (i, p) in cur.fetchall()}
 
@@ -254,7 +251,7 @@ def cargar_historial(cur, df_cargos, dry_run, now):
         caracter = str(row["caracter"]).strip().upper() if pd.notnull(row["caracter"]) else None
         docente_id = no_docente_id = None
         if caracter in CARACTERES_DOCENTE:
-            docente_id = persona_to_docente.get(persona_id)
+            docente_id = persona_id
         elif caracter in CARACTERES_NO_DOCENTE:
             no_docente_id = persona_to_nodocente.get(persona_id)
 
@@ -275,10 +272,10 @@ def cargar_historial(cur, df_cargos, dry_run, now):
         if not dry_run:
             cur.execute(
                 "INSERT INTO departamentos_cargohistorial "
-                "(cargo_id, docente_id, no_docente_id, fecha_inicio, fecha_fin, "
+                "(cargo_id, persona_id, no_docente_id, fecha_inicio, fecha_fin, "
                 " motivo_fin, observaciones, estado, fecha_creacion, fecha_modificacion) "
                 "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                (cargo_id, docente_id, no_docente_id, fecha_inicio, fecha_fin,
+                (cargo_id, persona_id, no_docente_id, fecha_inicio, fecha_fin,
                  motivo_fin, "Importado desde Excel.", "1", now, now),
             )
         creados += 1

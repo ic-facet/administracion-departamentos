@@ -24,7 +24,7 @@ interface Designacion {
   tipo: string;
   tipo_display: string;
   codigo_cargo: number | null;
-  docente_detalle: { apellido: string; nombre: string; dni: string } | null;
+  persona_detalle: { apellido: string; nombre: string; dni: string } | null;
   tipo_cargo_detalle: { denominacion: string; horas_semanales: number } | null;
   asignatura_detalle: { nombre: string } | null;
   expediente: string | null;
@@ -183,7 +183,7 @@ const ListaDesignaciones = () => {
           <ResponsiveTable dense>
             <TableHead>
               <TableRow>
-                <TableCell>Docente</TableCell>
+                <TableCell>Persona</TableCell>
                 <TableCell>Trámite</TableCell>
                 <TableCell>Cód.</TableCell>
                 <TableCell>Cargo</TableCell>
@@ -208,8 +208,8 @@ const ListaDesignaciones = () => {
               {items.map((d) => (
                 <TableRow key={d.id} hover>
                   <TableCell>
-                    {d.docente_detalle
-                      ? `${d.docente_detalle.apellido}, ${d.docente_detalle.nombre}`
+                    {d.persona_detalle
+                      ? `${d.persona_detalle.apellido}, ${d.persona_detalle.nombre}`
                       : "—"}
                   </TableCell>
                   <TableCell>{d.tipo_display}</TableCell>

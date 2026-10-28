@@ -1,12 +1,12 @@
 from rest_framework import serializers
-from ..models import CargoHistorial, CargoDepartamento, Docente, NoDocente, Resolucion
+from ..models import CargoHistorial, CargoDepartamento, Persona, NoDocente, Resolucion
 
 
 class CargoHistorialSerializer(serializers.ModelSerializer):
     cargo_departamento = serializers.PrimaryKeyRelatedField(
         queryset=CargoDepartamento.objects.all())
-    docente = serializers.PrimaryKeyRelatedField(
-        queryset=Docente.objects.all(), allow_null=True, required=False)
+    persona = serializers.PrimaryKeyRelatedField(
+        queryset=Persona.objects.all(), allow_null=True, required=False)
     no_docente = serializers.PrimaryKeyRelatedField(
         queryset=NoDocente.objects.all(), allow_null=True, required=False)
     resolucion = serializers.PrimaryKeyRelatedField(
@@ -17,16 +17,16 @@ class CargoHistorialSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate(self, attrs):
-        if attrs.get('docente') and attrs.get('no_docente'):
+        if attrs.get('persona') and attrs.get('no_docente'):
             raise serializers.ValidationError(
-                'docente y no_docente son mutuamente exclusivos.')
+                'persona y no_docente son mutuamente exclusivos.')
         return attrs
 
 
 class CargoHistorialDetailSerializer(serializers.ModelSerializer):
     cargo_departamento_descripcion = serializers.CharField(
         source='cargo_departamento.descripcion', read_only=True)
-    docente_detalle = serializers.SerializerMethodField()
+    persona_detalle = serializers.SerializerMethodField()
     no_docente_detalle = serializers.SerializerMethodField()
     resolucion_detalle = serializers.SerializerMethodField()
     duracion_dias = serializers.SerializerMethodField()
@@ -36,7 +36,7 @@ class CargoHistorialDetailSerializer(serializers.ModelSerializer):
         model = CargoHistorial
         fields = (
             'id', 'cargo_departamento', 'cargo_departamento_descripcion',
-            'docente', 'docente_detalle',
+            'persona', 'persona_detalle',
             'no_docente', 'no_docente_detalle',
             'fecha_inicio', 'fecha_fin', 'duracion_dias', 'vacante',
             'resolucion', 'resolucion_detalle', 'motivo_fin', 'observaciones', 'estado',
@@ -51,10 +51,10 @@ class CargoHistorialDetailSerializer(serializers.ModelSerializer):
             'legajo': persona.legajo,
         }
 
-    def get_docente_detalle(self, obj):
-        if not obj.docente:
+    def get_persona_detalle(self, obj):
+        if not obj.persona:
             return None
-        return self._persona_dict(obj.docente.persona, obj.docente.id)
+        return self._persona_dict(obj.persona, obj.persona.id)
 
     def get_no_docente_detalle(self, obj):
         if not obj.no_docente:
@@ -76,4 +76,4 @@ class CargoHistorialDetailSerializer(serializers.ModelSerializer):
         return (fin - obj.fecha_inicio).days
 
     def get_vacante(self, obj):
-        return obj.docente is None and obj.no_docente is None
+        return obj.persona is None and obj.no_docente is None

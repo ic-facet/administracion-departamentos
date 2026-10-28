@@ -12,7 +12,7 @@ import {
 import BasicModal from "@/utils/modal";
 
 export interface SeguimientoPayload {
-  docente: number | "";
+  persona: number | "";
   tipo: string;
   descripcion: string;
   fecha_novedad: string;
@@ -25,7 +25,7 @@ export interface SeguimientoPayload {
 }
 
 export const VACIO: SeguimientoPayload = {
-  docente: "",
+  persona: "",
   tipo: "otro",
   descripcion: "",
   fecha_novedad: new Date().toISOString().slice(0, 10),
@@ -79,14 +79,14 @@ export const SeguimientoForm: React.FC<{
   useEffect(() => {
     const t = setTimeout(() => {
       const q = buscar.trim();
-      API.get(`/facet/docente/?page_size=50${q ? `&search=${encodeURIComponent(q)}` : ""}`)
+      API.get(`/facet/persona/?page_size=50${q ? `&search=${encodeURIComponent(q)}` : ""}`)
         .then(({ data }) =>
           setDocentes(
             listaDe(data).map((d: any) => ({
               id: d.id,
-              label: d.persona_detalle
-                ? `${d.persona_detalle.apellido}, ${d.persona_detalle.nombre} (DNI ${d.persona_detalle.dni})`
-                : `Docente #${d.id}`,
+              label: d.apellido
+                ? `${d.apellido}, ${d.nombre} (DNI ${d.dni})`
+                : `Persona #${d.id}`,
             }))
           )
         )
@@ -96,8 +96,8 @@ export const SeguimientoForm: React.FC<{
   }, [buscar]);
 
   const guardar = async () => {
-    if (!valor.docente) {
-      setModal({ t: "Revisá los datos", m: "Elegí el docente." });
+    if (!valor.persona) {
+      setModal({ t: "Revisá los datos", m: "Elegí la persona." });
       return;
     }
     if (!valor.descripcion.trim()) {
@@ -143,20 +143,20 @@ export const SeguimientoForm: React.FC<{
     <FormContainer title={titulo}>
       <FormSection title="Docente">
         <FormField
-          label="Buscar docente"
+          label="Buscar persona"
           value={buscar}
           onChange={(e) => setBuscar(e.target.value)}
           placeholder="Apellido, DNI o legajo…"
         />
         <FormField
-          label="Docente"
+          label="Persona"
           required
-          value={valor.docente === "" ? "" : valor.docente}
+          value={valor.persona === "" ? "" : valor.persona}
           onChange={(e) =>
-            set("docente", e.target.value === "" ? "" : Number(e.target.value))
+            set("persona", e.target.value === "" ? "" : Number(e.target.value))
           }
           options={[
-            { value: "", label: "(Elegir docente)" },
+            { value: "", label: "(Elegir persona)" },
             ...docentes.map((d) => ({ value: d.id, label: d.label })),
           ]}
         />
@@ -254,7 +254,7 @@ export const SeguimientoForm: React.FC<{
 };
 
 export const aPayload = (v: SeguimientoPayload) => ({
-  docente: v.docente,
+  persona: v.persona,
   tipo: v.tipo,
   descripcion: v.descripcion.trim(),
   fecha_novedad: v.fecha_novedad,

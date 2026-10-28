@@ -3,12 +3,11 @@ from rest_framework import serializers
 from ..models import Licencia
 
 
-def _persona_mini(docente):
-    if not docente:
+def _persona_mini(p):
+    if not p:
         return None
-    p = docente.persona
     return {
-        'id': docente.id,
+        'id': p.id,
         'nombre': p.nombre,
         'apellido': p.apellido,
         'dni': p.dni,
@@ -18,14 +17,14 @@ def _persona_mini(docente):
 
 class LicenciaSerializer(serializers.ModelSerializer):
     tipo_display = serializers.CharField(source='get_tipo_display', read_only=True)
-    docente_detalle = serializers.SerializerMethodField()
+    persona_detalle = serializers.SerializerMethodField()
     reemplazante_detalle = serializers.SerializerMethodField()
     vigente = serializers.SerializerMethodField()
 
     class Meta:
         model = Licencia
         fields = [
-            'id', 'docente', 'docente_detalle',
+            'id', 'persona', 'persona_detalle',
             'tipo', 'tipo_display',
             'codigo_cargo', 'cargo_departamento',
             'fecha_inicio', 'fecha_fin', 'vigente',
@@ -36,8 +35,8 @@ class LicenciaSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['fecha_creacion', 'fecha_modificacion']
 
-    def get_docente_detalle(self, obj):
-        return _persona_mini(obj.docente)
+    def get_persona_detalle(self, obj):
+        return _persona_mini(obj.persona)
 
     def get_reemplazante_detalle(self, obj):
         return _persona_mini(obj.reemplazante)
@@ -55,10 +54,10 @@ class LicenciaSerializer(serializers.ModelSerializer):
                 'fecha_fin': 'La fecha de fin no puede ser anterior al inicio.',
             })
 
-        docente = attrs.get('docente', getattr(instancia, 'docente', None))
+        persona = attrs.get('persona', getattr(instancia, 'persona', None))
         reemplazante = attrs.get('reemplazante', getattr(instancia, 'reemplazante', None))
-        if docente and reemplazante and docente == reemplazante:
+        if persona and reemplazante and persona == reemplazante:
             raise serializers.ValidationError({
-                'reemplazante': 'El reemplazante no puede ser el mismo docente.',
+                'reemplazante': 'El reemplazante no puede ser el misma persona.',
             })
         return attrs

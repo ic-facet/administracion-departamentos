@@ -19,7 +19,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from ..models import (
-    Area, Asignatura, AsignaturaDocente, Designacion, Docente,
+    Area, Asignatura, AsignaturaDocente, Designacion, Persona,
     EstadisticaAsignatura, Licencia, Seguimiento,
 )
 
@@ -266,8 +266,11 @@ class ReportePlantaView(APIView):
         # designaciones: una renuncia o una prórroga por cargo de gestión no
         # tienen área ni asignatura, y filtrarlas directamente las dejaría
         # afuera, con lo que los cargos nunca se cerrarían ni se extenderían.
-        docentes_qs = Docente.objects.filter(estado='1').select_related(
-            'persona', 'persona__titulo')
+        # No existe un modelo Docente: se considera docente a la persona con
+        # alguna designación o asignación a asignatura activa.
+        docentes_qs = Persona.objects.filter(estado='1').filter(
+            Q(designaciones__estado='1') | Q(asignaturadocente__estado='1')
+        ).select_related('titulo').distinct()
 
         if depto_id:
             docentes_del_depto = set(
@@ -275,12 +278,12 @@ class ReportePlantaView(APIView):
                     Q(cargo_departamento__departamento_id=depto_id)
                     | Q(asignatura__departamento_id=depto_id)
                     | Q(area__departamento_id=depto_id)
-                ).values_list('docente_id', flat=True)
+                ).values_list('persona_id', flat=True)
             )
             docentes_del_depto |= set(
                 AsignaturaDocente.objects.filter(
                     estado='1', asignatura__departamento_id=depto_id,
-                ).values_list('docente_id', flat=True)
+                ).values_list('persona_id', flat=True)
             )
             docentes_qs = docentes_qs.filter(id__in=docentes_del_depto)
 
@@ -288,16 +291,16 @@ class ReportePlantaView(APIView):
         docente_ids = [d.id for d in docentes]
 
         desigs_qs = Designacion.objects.filter(
-            estado='1', docente_id__in=docente_ids,
+            estado='1', persona_id__in=docente_ids,
         ).select_related(
-            'docente__persona', 'tipo_cargo', 'asignatura', 'area',
+            'persona', 'tipo_cargo', 'asignatura', 'area',
             'cargo_departamento', 'resolucion',
         )
         designaciones = list(desigs_qs)
 
         docente_info = {}
         for d in docentes:
-            p = d.persona
+            p = d
             docente_info[d.id] = {
                 'id': d.id,
                 'dni': p.dni,
@@ -319,15 +322,15 @@ class ReportePlantaView(APIView):
             }
 
         licencias_qs = Licencia.objects.filter(
-            estado='1', docente_id__in=docente_ids,
-        ).select_related('docente__persona', 'reemplazante__persona')
+            estado='1', persona_id__in=docente_ids,
+        ).select_related('persona', 'reemplazante')
         licencias_por_docente = defaultdict(list)
         for l in licencias_qs:
-            licencias_por_docente[l.docente_id].append(l)
+            licencias_por_docente[l.persona_id].append(l)
 
         desigs_por_docente = defaultdict(list)
         for d in designaciones:
-            desigs_por_docente[d.docente_id].append(d)
+            desigs_por_docente[d.persona_id].append(d)
 
         ocupaciones = _derivar_ocupaciones(
             desigs_por_docente, licencias_por_docente, docente_info, hoy)
@@ -389,7 +392,7 @@ class ReportePlantaView(APIView):
 
         seguimientos_abiertos = Seguimiento.objects.filter(
             estado='1', estado_seguimiento__in=['pendiente', 'en_curso'],
-            docente_id__in=list(docente_info.keys()),
+            persona_id__in=list(docente_info.keys()),
         ).count()
 
         return {
@@ -622,8 +625,8 @@ class ReportePlantaView(APIView):
         def fila(d):
             return {
                 'id': d.id,
-                'docente': f'{d.docente.persona.apellido}, {d.docente.persona.nombre}',
-                'docente_id': d.docente_id,
+                'docente': f'{d.persona.apellido}, {d.persona.nombre}',
+                'docente_id': d.persona_id,
                 'tipo': d.tipo,
                 'tipo_display': d.get_tipo_display(),
                 'codigo_cargo': d.codigo_cargo,
@@ -667,12 +670,12 @@ class ReportePlantaView(APIView):
 
         # La relación AsignaturaDocente sigue siendo válida como fuente extra.
         ad_qs = AsignaturaDocente.objects.filter(estado='1').select_related(
-            'asignatura', 'docente')
+            'asignatura', 'persona')
         if depto_id:
             ad_qs = ad_qs.filter(asignatura__departamento_id=depto_id)
         for ad in ad_qs:
-            if ad.docente_id in activos:
-                docentes_por_asig[ad.asignatura.nombre].add(ad.docente_id)
+            if ad.persona_id in activos:
+                docentes_por_asig[ad.asignatura.nombre].add(ad.persona_id)
 
         # Matrícula del último año cargado, por asignatura.
         est_qs = EstadisticaAsignatura.objects.filter(estado='1')
@@ -755,14 +758,14 @@ class ReportePlantaView(APIView):
 
     def _seguimientos(self, docente_info):
         qs = Seguimiento.objects.filter(
-            estado='1', docente_id__in=list(docente_info.keys()),
-        ).select_related('docente__persona').order_by(
+            estado='1', persona_id__in=list(docente_info.keys()),
+        ).select_related('persona').order_by(
             'estado_seguimiento', '-fecha_novedad')
 
         filas = [{
             'id': s.id,
-            'docente_id': s.docente_id,
-            'docente': f'{s.docente.persona.apellido}, {s.docente.persona.nombre}',
+            'docente_id': s.persona_id,
+            'docente': f'{s.persona.apellido}, {s.persona.nombre}',
             'tipo': s.tipo,
             'tipo_display': s.get_tipo_display(),
             'descripcion': s.descripcion,

@@ -11,7 +11,6 @@ import ResponsiveTable from "../../../../../components/ResponsiveTable";
 import ActionMenu from "../../../../../components/ActionMenu";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { exportToExcel } from "@/utils/exportToExcel";
@@ -32,16 +31,12 @@ import { normalizeUrl } from "@/utils/urlHelpers";
 const ListaDocentes = () => {
   interface Docente {
     id: number;
-    persona: number;
-    persona_detalle: {
-      id: number;
-      nombre: string;
-      apellido: string;
-      dni: string;
-      legajo: string;
-      telefono: string;
-      email: string;
-    };
+    nombre: string;
+    apellido: string;
+    dni: string;
+    legajo: string;
+    telefono: string;
+    email: string;
     estado: string;
   }
 
@@ -54,7 +49,7 @@ const ListaDocentes = () => {
   const [nextUrl, setNextUrl] = useState<string | null>(null);
   const [prevUrl, setPrevUrl] = useState<string | null>(null);
   const [currentUrl, setCurrentUrl] = useState<string>(
-    `/facet/docente/?estado=1`
+    `/facet/persona/?docente=true&estado=1`
   );
   const [totalItems, setTotalItems] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -92,13 +87,13 @@ const ListaDocentes = () => {
   };
 
   const filtrarDocentes = () => {
-    let url = `/facet/docente/?`;
+    let url = `/facet/persona/?docente=true&`;
     const params = new URLSearchParams();
     if (filtroNombre !== "") {
-      params.append("persona__nombre__icontains", filtroNombre);
+      params.append("nombre__icontains", filtroNombre);
     }
     if (filtroDni !== "") {
-      params.append("persona__dni__icontains", filtroDni);
+      params.append("dni__icontains", filtroDni);
     }
     if (filtroEstado === "todos") {
       params.append("show_all", "true");
@@ -106,10 +101,10 @@ const ListaDocentes = () => {
       params.append("estado", filtroEstado.toString());
     }
     if (filtroApellido !== "") {
-      params.append("persona__apellido__icontains", filtroApellido);
+      params.append("apellido__icontains", filtroApellido);
     }
     if (filtroLegajo !== "") {
-      params.append("persona__legajo__icontains", filtroLegajo);
+      params.append("legajo__icontains", filtroLegajo);
     }
     url += params.toString();
     setCurrentPage(1);
@@ -123,22 +118,22 @@ const ListaDocentes = () => {
     setFiltroLegajo("");
     setFiltroEstado("1");
     setCurrentPage(1);
-    setCurrentUrl(`/facet/docente/?estado=1`);
+    setCurrentUrl(`/facet/persona/?docente=true&estado=1`);
   };
 
   const descargarExcel = async () => {
     try {
       let allDocentes: Docente[] = [];
-      let url = `/facet/docente/?`;
+      let url = `/facet/persona/?docente=true&`;
       const params = new URLSearchParams();
 
       if (filtroNombre !== "")
-        params.append("persona__nombre__icontains", filtroNombre);
+        params.append("nombre__icontains", filtroNombre);
       if (filtroApellido !== "")
-        params.append("persona__apellido__icontains", filtroApellido);
-      if (filtroDni !== "") params.append("persona__dni__icontains", filtroDni);
+        params.append("apellido__icontains", filtroApellido);
+      if (filtroDni !== "") params.append("dni__icontains", filtroDni);
       if (filtroLegajo !== "")
-        params.append("persona__legajo__icontains", filtroLegajo);
+        params.append("legajo__icontains", filtroLegajo);
       if (filtroEstado === "todos") {
         params.append("show_all", "true");
       } else if (filtroEstado !== "" && filtroEstado !== "todos") {
@@ -157,12 +152,12 @@ const ListaDocentes = () => {
         fileName: "docentes.xlsx",
         sheetName: "Docentes",
         rows: allDocentes.map((docente) => ({
-          Nombre: docente.persona_detalle?.nombre || "N/A",
-          Apellido: docente.persona_detalle?.apellido || "N/A",
-          DNI: docente.persona_detalle?.dni || "N/A",
-          Legajo: docente.persona_detalle?.legajo || "N/A",
-          Teléfono: docente.persona_detalle?.telefono || "N/A",
-          Email: docente.persona_detalle?.email || "N/A",
+          Nombre: docente.nombre || "N/A",
+          Apellido: docente.apellido || "N/A",
+          DNI: docente.dni || "N/A",
+          Legajo: docente.legajo || "N/A",
+          Teléfono: docente.telefono || "N/A",
+          Email: docente.email || "N/A",
           Estado: docente.estado === "1" ? "Activo" : "Inactivo",
         })),
       });
@@ -177,7 +172,7 @@ const ListaDocentes = () => {
 
   const verDocente = async (id: number) => {
     try {
-      const response = await API.get(`/facet/docente/${id}/`);
+      const response = await API.get(`/facet/persona/${id}/`);
       setViewDocente(response.data);
       setModalViewVisible(true);
     } catch (error) {
@@ -186,29 +181,6 @@ const ListaDocentes = () => {
         "No se pudo obtener los datos del docente.",
         "error"
       );
-    }
-  };
-
-  const eliminarDocente = async (id: number) => {
-    try {
-      const result = await Swal.fire({
-        title: "¿Estás seguro?",
-        text: "Esta acción no se puede deshacer",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Sí, eliminar",
-        cancelButtonText: "Cancelar",
-      });
-
-      if (result.isConfirmed) {
-        await API.delete(`/facet/docente/${id}/`);
-        Swal.fire("Eliminado!", "El docente ha sido eliminado.", "success");
-        fetchData(currentUrl);
-      }
-    } catch (error) {
-      Swal.fire("Error!", "No se pudo eliminar el docente.", "error");
     }
   };
 
@@ -225,9 +197,9 @@ const ListaDocentes = () => {
         <div className="p-6">
           <div className="flex gap-4 mb-6">
             <button
-              onClick={() => router.push("/dashboard/persons/docentes/create")}
+              onClick={() => router.push("/dashboard/persons/create")}
               className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2.5 rounded-xl shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-200 font-semibold text-sm">
-              <AddIcon /> Agregar Docente
+              <AddIcon /> Agregar Persona
             </button>
             <button
               onClick={descargarExcel}
@@ -301,22 +273,22 @@ const ListaDocentes = () => {
                 {docentes.map((docente) => (
                   <TableRow key={docente.id} className="hover:bg-gray-50">
                     <TableCell className="text-gray-800">
-                      {docente.persona_detalle?.nombre || "N/A"}
+                      {docente.nombre || "N/A"}
                     </TableCell>
                     <TableCell className="text-gray-800">
-                      {docente.persona_detalle?.apellido || "N/A"}
+                      {docente.apellido || "N/A"}
                     </TableCell>
                     <TableCell className="text-gray-800">
-                      {docente.persona_detalle?.dni || "N/A"}
+                      {docente.dni || "N/A"}
                     </TableCell>
                     <TableCell className="text-gray-800">
-                      {docente.persona_detalle?.legajo || "N/A"}
+                      {docente.legajo || "N/A"}
                     </TableCell>
                     <TableCell className="text-gray-800">
-                      {docente.persona_detalle?.telefono || "N/A"}
+                      {docente.telefono || "N/A"}
                     </TableCell>
                     <TableCell className="text-gray-800">
-                      {docente.persona_detalle?.email || "N/A"}
+                      {docente.email || "N/A"}
                     </TableCell>
                     <TableCell className="text-gray-800">
                       <StatusBadge estado={String(docente.estado)} />
@@ -336,18 +308,8 @@ const ListaDocentes = () => {
                                 icon: <EditIcon fontSize="small" />,
                                 onClick: () =>
                                   router.push(
-                                    `/dashboard/persons/docentes/edit/${docente.id}`
+                                    `/dashboard/persons/edit/${docente.id}`
                                   ),
-                              },
-                            ],
-                          },
-                          {
-                            items: [
-                              {
-                                label: "Eliminar",
-                                icon: <DeleteIcon fontSize="small" />,
-                                onClick: () => eliminarDocente(docente.id),
-                                danger: true,
                               },
                             ],
                           },
@@ -385,24 +347,24 @@ const ListaDocentes = () => {
           onClose={() => setModalViewVisible(false)}
           onEdit={() => {
             setModalViewVisible(false);
-            router.push(`/dashboard/persons/docentes/edit/${viewDocente.id}`);
+            router.push(`/dashboard/persons/edit/${viewDocente.id}`);
           }}
           title="Detalles del Docente"
           sections={[
             {
               title: "Información personal",
               fields: [
-                { label: "DNI", value: viewDocente.persona_detalle?.dni },
-                { label: "Legajo", value: viewDocente.persona_detalle?.legajo },
-                { label: "Nombres", value: viewDocente.persona_detalle?.nombre },
-                { label: "Apellido", value: viewDocente.persona_detalle?.apellido },
+                { label: "DNI", value: viewDocente.dni },
+                { label: "Legajo", value: viewDocente.legajo },
+                { label: "Nombres", value: viewDocente.nombre },
+                { label: "Apellido", value: viewDocente.apellido },
               ],
             },
             {
               title: "Información de contacto",
               fields: [
-                { label: "Teléfono", value: viewDocente.persona_detalle?.telefono },
-                { label: "Email", value: viewDocente.persona_detalle?.email },
+                { label: "Teléfono", value: viewDocente.telefono },
+                { label: "Email", value: viewDocente.email },
                 { label: "Estado", value: <StatusBadge estado={viewDocente.estado} /> },
               ],
             },

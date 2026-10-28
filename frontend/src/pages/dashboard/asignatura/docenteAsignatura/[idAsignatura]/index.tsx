@@ -90,13 +90,6 @@ const ListaDocenteAsignatura: React.FC = () => {
     email?: string;
   }
 
-  interface Docente {
-    id: number;
-    persona: Persona;
-    observaciones: string;
-    estado: 0 | 1;
-  }
-
   interface Resolucion {
     id: number;
     nexpediente: string;
@@ -111,7 +104,7 @@ const ListaDocenteAsignatura: React.FC = () => {
 
   interface AsignaturaDocente {
     id: number;
-    docente: Docente;
+    persona: Persona;
     resolucion?: Resolucion;
     condicion: Condicion;
     tipo_cargo: TipoCargo;
@@ -234,14 +227,14 @@ const ListaDocenteAsignatura: React.FC = () => {
     const params = new URLSearchParams();
 
     if (filtroNombre.trim())
-      params.append("docente__persona__nombre__icontains", filtroNombre.trim());
+      params.append("persona__nombre__icontains", filtroNombre.trim());
     if (filtroApellido.trim())
       params.append(
-        "docente__persona__apellido__icontains",
+        "persona__apellido__icontains",
         filtroApellido.trim()
       );
     if (filtroDni.trim())
-      params.append("docente__persona__dni__icontains", filtroDni.trim());
+      params.append("persona__dni__icontains", filtroDni.trim());
     if (filtroTipoCargo) params.append("tipo_cargo", filtroTipoCargo);
     if (filtroDedicacion) params.append("dedicacion", filtroDedicacion);
     if (filtroCondicion) params.append("condicion", filtroCondicion);
@@ -250,7 +243,7 @@ const ListaDocenteAsignatura: React.FC = () => {
       params.append("show_all", "true");
     } else if (filtroEstado && filtroEstado !== "todos") {
       params.append(
-        "docente__persona__estado__icontains",
+        "persona__estado__icontains",
         filtroEstado.toString()
       );
     }
@@ -286,14 +279,14 @@ const ListaDocenteAsignatura: React.FC = () => {
     const params = new URLSearchParams();
 
     if (filtroNombre.trim())
-      params.append("docente__persona__nombre__icontains", filtroNombre.trim());
+      params.append("persona__nombre__icontains", filtroNombre.trim());
     if (filtroApellido.trim())
       params.append(
-        "docente__persona__apellido__icontains",
+        "persona__apellido__icontains",
         filtroApellido.trim()
       );
     if (filtroDni.trim())
-      params.append("docente__persona__dni__icontains", filtroDni.trim());
+      params.append("persona__dni__icontains", filtroDni.trim());
     if (filtroTipoCargo) params.append("tipo_cargo", filtroTipoCargo);
     if (filtroDedicacion) params.append("dedicacion", filtroDedicacion);
     if (filtroCondicion) params.append("condicion", filtroCondicion);
@@ -302,7 +295,7 @@ const ListaDocenteAsignatura: React.FC = () => {
       params.append("show_all", "true");
     } else if (filtroEstado && filtroEstado !== "todos") {
       params.append(
-        "docente__persona__estado__icontains",
+        "persona__estado__icontains",
         filtroEstado.toString()
       );
     }
@@ -332,7 +325,7 @@ const ListaDocenteAsignatura: React.FC = () => {
         // Actualizar el estado local para marcar como notificado
         setAsignaturaDocentes((prev) =>
           prev.map((docente) =>
-            docente.docente.persona.id === id
+            docente.persona.id === id
               ? { ...docente, notificado: true }
               : docente
           )
@@ -437,16 +430,16 @@ const ListaDocenteAsignatura: React.FC = () => {
 
       if (filtroNombre.trim())
         params.append(
-          "docente__persona__nombre__icontains",
+          "persona__nombre__icontains",
           filtroNombre.trim()
         );
       if (filtroApellido.trim())
         params.append(
-          "docente__persona__apellido__icontains",
+          "persona__apellido__icontains",
           filtroApellido.trim()
         );
       if (filtroDni.trim())
-        params.append("docente__persona__dni__icontains", filtroDni.trim());
+        params.append("persona__dni__icontains", filtroDni.trim());
       if (filtroTipoCargo) params.append("tipo_cargo", filtroTipoCargo);
       if (filtroDedicacion) params.append("dedicacion", filtroDedicacion);
       if (filtroCondicion) params.append("condicion", filtroCondicion);
@@ -455,7 +448,7 @@ const ListaDocenteAsignatura: React.FC = () => {
         params.append("show_all", "true");
       } else if (filtroEstado && filtroEstado !== "todos") {
         params.append(
-          "docente__persona__estado__icontains",
+          "persona__estado__icontains",
           filtroEstado.toString()
         );
       }
@@ -506,10 +499,10 @@ const ListaDocenteAsignatura: React.FC = () => {
       const rows = docentesCompletos.map((docente) => {
           try {
             return {
-              Nombre: docente.docente?.persona?.nombre || "N/A",
-              Apellido: docente.docente?.persona?.apellido || "N/A",
-              DNI: docente.docente?.persona?.dni || "N/A",
-              Email: docente.docente?.persona?.email || "N/A",
+              Nombre: docente.persona?.nombre || "N/A",
+              Apellido: docente.persona?.apellido || "N/A",
+              DNI: docente.persona?.dni || "N/A",
+              Email: docente.persona?.email || "N/A",
               Condición: docente.condicion || "N/A",
               Cargo: docente.tipo_cargo || "N/A",
               "Nº Cargo": docente.cargo ?? "N/A",
@@ -722,11 +715,11 @@ const ListaDocenteAsignatura: React.FC = () => {
                     key={docente.id}
                     className="hover:bg-gray-50 transition-colors duration-150">
                     <TableCell className="text-gray-800">
-                      {docente.docente.persona.nombre}{" "}
-                      {docente.docente.persona.apellido}
+                      {docente.persona.nombre}{" "}
+                      {docente.persona.apellido}
                     </TableCell>
                     <TableCell className="text-gray-800">
-                      {docente.docente.persona.dni}
+                      {docente.persona.dni}
                     </TableCell>
                     <TableCell className="text-gray-800">
                       {docente.condicion}
@@ -772,7 +765,7 @@ const ListaDocenteAsignatura: React.FC = () => {
                           </button>
                         </Tooltip>
 
-                        {docente.docente.persona.email && (
+                        {docente.persona.email && (
                           <Tooltip
                             title={
                               docente.notificado
@@ -783,12 +776,12 @@ const ListaDocenteAsignatura: React.FC = () => {
                               onClick={() =>
                                 docente.notificado
                                   ? confirmarReenvio(
-                                      docente.docente.persona.id,
-                                      docente.docente.persona.email!
+                                      docente.persona.id,
+                                      docente.persona.email!
                                     )
                                   : enviarNotificacion(
-                                      docente.docente.persona.id,
-                                      docente.docente.persona.email!
+                                      docente.persona.id,
+                                      docente.persona.email!
                                     )
                               }
                               className={`p-2 rounded-lg transition-colors duration-200 ${
@@ -893,8 +886,8 @@ const ListaDocenteAsignatura: React.FC = () => {
                         Nombre Completo
                       </label>
                       <p className="text-gray-900 font-medium">
-                        {docenteSeleccionado.docente.persona.nombre}{" "}
-                        {docenteSeleccionado.docente.persona.apellido}
+                        {docenteSeleccionado.persona.nombre}{" "}
+                        {docenteSeleccionado.persona.apellido}
                       </p>
                     </div>
 
@@ -903,7 +896,7 @@ const ListaDocenteAsignatura: React.FC = () => {
                         DNI
                       </label>
                       <p className="text-gray-900 font-medium">
-                        {docenteSeleccionado.docente.persona.dni ||
+                        {docenteSeleccionado.persona.dni ||
                           "No especificado"}
                       </p>
                     </div>
@@ -913,7 +906,7 @@ const ListaDocenteAsignatura: React.FC = () => {
                         Email
                       </label>
                       <p className="text-gray-900 font-medium">
-                        {docenteSeleccionado.docente.persona.email ||
+                        {docenteSeleccionado.persona.email ||
                           "No especificado"}
                       </p>
                     </div>

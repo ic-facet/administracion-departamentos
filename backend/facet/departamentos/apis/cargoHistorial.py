@@ -24,17 +24,17 @@ class CargoHistorialViewSet(viewsets.ModelViewSet):
         'estado': ['exact'],
         'cargo_departamento': ['exact'],
         'cargo_departamento__departamento': ['exact'],
-        'docente': ['exact'],
-        'docente__persona__dni': ['icontains'],
-        'docente__persona__apellido': ['icontains'],
+        'persona': ['exact'],
+        'persona__dni': ['icontains'],
+        'persona__apellido': ['icontains'],
         'motivo_fin': ['exact'],
         'fecha_inicio': ['gte', 'lte'],
         'fecha_fin': ['gte', 'lte', 'isnull'],
     }
     search_fields = [
         'cargo_departamento__descripcion',
-        'docente__persona__nombre',
-        'docente__persona__apellido',
+        'persona__nombre',
+        'persona__apellido',
     ]
 
     def get_serializer_class(self):
@@ -52,7 +52,7 @@ class CargoHistorialViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = CargoHistorial.objects.select_related(
             'cargo_departamento__departamento',
-            'docente__persona', 'resolucion'
+            'persona', 'resolucion'
         ).all()
         if self.request.query_params.get('show_all', False):
             return queryset

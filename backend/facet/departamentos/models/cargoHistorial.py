@@ -17,13 +17,14 @@ class CargoHistorial(BaseModel):
 
     cargo_departamento = models.ForeignKey(
         'CargoDepartamento', on_delete=models.CASCADE, related_name='historial')
-    docente = models.ForeignKey(
-        'Docente', on_delete=models.SET_NULL, null=True, blank=True,
-        help_text='Ocupante docente. Mutuamente exclusivo con no_docente.')
+    persona = models.ForeignKey(
+        'Persona', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='historial_cargos_docentes',
+        help_text='Ocupante docente (persona). Mutuamente exclusivo con no_docente.')
     no_docente = models.ForeignKey(
         'NoDocente', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='historial_cargos',
-        help_text='Ocupante no-docente. Mutuamente exclusivo con docente.')
+        help_text='Ocupante no-docente. Mutuamente exclusivo con persona.')
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField(
         null=True, blank=True,
@@ -37,8 +38,8 @@ class CargoHistorial(BaseModel):
 
     def clean(self):
         super().clean()
-        if self.docente and self.no_docente:
-            raise ValidationError('docente y no_docente son mutuamente exclusivos.')
+        if self.persona and self.no_docente:
+            raise ValidationError('persona y no_docente son mutuamente exclusivos.')
         if self.fecha_fin and self.fecha_fin < self.fecha_inicio:
             raise ValidationError({'fecha_fin': 'fecha_fin no puede ser anterior a fecha_inicio.'})
 
@@ -63,7 +64,7 @@ class CargoHistorial(BaseModel):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        quien = self.docente or 'Vacante'
+        quien = self.persona or 'Vacante'
         fin = self.fecha_fin or 'vigente'
         return f"{self.cargo_departamento} | {quien} | {self.fecha_inicio} → {fin}"
 

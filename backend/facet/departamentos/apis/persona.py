@@ -9,6 +9,8 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from datetime import date, timedelta
 from django.utils import timezone
+from django.utils.dateparse import parse_date
+from django.db.models import Q
 
 class PersonaViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -38,15 +40,31 @@ class PersonaViewSet(viewsets.ModelViewSet):
         o si se filtra explícitamente por estado
         """
         queryset = Persona.objects.select_related('titulo').all()
-        
+        params = self.request.query_params
+
+        # Docente = persona con una designación o asignación vigente a una
+        # fecha de referencia (por defecto hoy). No es un atributo fijo.
+        if params.get('docente', '').lower() in ('1', 'true'):
+            fecha = parse_date(params.get('fecha', '')) or date.today()
+            queryset = queryset.filter(
+                Q(designaciones__estado='1',
+                  designaciones__fecha_desde__lte=fecha)
+                & (Q(designaciones__fecha_hasta__isnull=True)
+                   | Q(designaciones__fecha_hasta__gte=fecha))
+                | Q(asignaturadocente__estado='1',
+                    asignaturadocente__fecha_de_inicio__date__lte=fecha)
+                & (Q(asignaturadocente__fecha_de_vencimiento__isnull=True)
+                   | Q(asignaturadocente__fecha_de_vencimiento__date__gte=fecha))
+            ).distinct()
+
         # Si se especifica show_all, mostrar todos
-        if self.request.query_params.get('show_all', False):
+        if params.get('show_all', False):
             return queryset
-            
+
         # Si se filtra explícitamente por estado, no aplicar filtro automático
-        if 'estado' in self.request.query_params:
+        if 'estado' in params:
             return queryset
-            
+
         # Por defecto, mostrar solo activos
         return queryset.filter(estado='1')
 

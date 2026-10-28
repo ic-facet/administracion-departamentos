@@ -25,7 +25,7 @@ class DesignacionViewSet(viewsets.ModelViewSet):
     filterset_fields = {
         'estado': ['exact'],
         'tipo': ['exact', 'in'],
-        'docente': ['exact'],
+        'persona': ['exact'],
         'codigo_cargo': ['exact'],
         'tipo_cargo': ['exact'],
         'cargo_departamento': ['exact', 'isnull'],
@@ -37,15 +37,15 @@ class DesignacionViewSet(viewsets.ModelViewSet):
         'fecha_hasta': ['exact', 'gte', 'lte', 'isnull'],
     }
     search_fields = [
-        'docente__persona__apellido', 'docente__persona__nombre',
-        'docente__persona__dni', 'expediente', 'nro_resolucion',
+        'persona__apellido', 'persona__nombre',
+        'persona__dni', 'expediente', 'nro_resolucion',
         'dgpres', 'rol_gestion',
     ]
     ordering_fields = ['fecha_desde', 'fecha_hasta', 'tipo', 'codigo_cargo']
 
     def get_queryset(self):
         qs = Designacion.objects.select_related(
-            'docente__persona', 'tipo_cargo', 'asignatura', 'area',
+            'persona', 'tipo_cargo', 'asignatura', 'area',
             'resolucion', 'cargo_departamento',
         ).all()
 
