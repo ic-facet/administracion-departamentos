@@ -22,19 +22,19 @@ class SeguimientoViewSet(viewsets.ModelViewSet):
         'estado_seguimiento': ['exact', 'in'],
         'tipo': ['exact', 'in'],
         'prioridad': ['exact'],
-        'docente': ['exact'],
+        'persona': ['exact'],
         'responsable': ['exact', 'icontains'],
         'fecha_novedad': ['exact', 'gte', 'lte'],
     }
     search_fields = [
         'descripcion', 'responsable',
-        'docente__persona__apellido', 'docente__persona__nombre',
+        'persona__apellido', 'persona__nombre',
     ]
     ordering_fields = ['fecha_novedad', 'prioridad', 'estado_seguimiento']
 
     def get_queryset(self):
         qs = Seguimiento.objects.select_related(
-            'docente__persona', 'designacion').all()
+            'persona', 'designacion').all()
 
         params = self.request.query_params
         if params.get('abiertos') in ('1', 'true', 'True'):

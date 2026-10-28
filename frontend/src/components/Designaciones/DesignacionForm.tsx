@@ -14,7 +14,7 @@ import {
 import BasicModal from "@/utils/modal";
 
 export interface DesignacionPayload {
-  docente: number | "";
+  persona: number | "";
   tipo: string;
   tipo_cargo: number | "";
   codigo_cargo: number | "";
@@ -36,7 +36,7 @@ export interface DesignacionPayload {
 }
 
 export const VACIO: DesignacionPayload = {
-  docente: "",
+  persona: "",
   tipo: "DI_GENUINO",
   tipo_cargo: "",
   codigo_cargo: "",
@@ -166,14 +166,14 @@ export const DesignacionForm: React.FC<{
   useEffect(() => {
     const t = setTimeout(() => {
       const q = buscarDocente.trim();
-      API.get(`/facet/docente/?page_size=50${q ? `&search=${encodeURIComponent(q)}` : ""}`)
+      API.get(`/facet/persona/?page_size=50${q ? `&search=${encodeURIComponent(q)}` : ""}`)
         .then(({ data }) =>
           setDocentes(
             listaDe(data).map((d: any) => ({
               id: d.id,
-              label: d.persona_detalle
-                ? `${d.persona_detalle.apellido}, ${d.persona_detalle.nombre} (DNI ${d.persona_detalle.dni})`
-                : `Docente #${d.id}`,
+              label: d.apellido
+                ? `${d.apellido}, ${d.nombre} (DNI ${d.dni})`
+                : `Persona #${d.id}`,
             }))
           )
         )
@@ -206,7 +206,7 @@ export const DesignacionForm: React.FC<{
   const esRenuncia = valor.tipo === "RENUNCIA";
 
   const validar = (): string | null => {
-    if (!valor.docente) return "Elegí el docente.";
+    if (!valor.persona) return "Elegí la persona.";
     if (!valor.tipo) return "Elegí el tipo de trámite.";
     if (!esGestion && !valor.tipo_cargo && !valor.codigo_cargo)
       return "Indicá el tipo de cargo o el código de cargo: sin eso la designación no se puede agrupar en una ocupación.";
@@ -254,20 +254,20 @@ export const DesignacionForm: React.FC<{
     <FormContainer title={titulo}>
       <FormSection title="Docente y trámite">
         <FormField
-          label="Buscar docente"
+          label="Buscar persona"
           value={buscarDocente}
           onChange={(e) => setBuscarDocente(e.target.value)}
           placeholder="Apellido, DNI o legajo…"
         />
         <FormField
-          label="Docente"
+          label="Persona"
           required
-          value={valor.docente === "" ? "" : valor.docente}
+          value={valor.persona === "" ? "" : valor.persona}
           onChange={(e) =>
-            set("docente", e.target.value === "" ? "" : Number(e.target.value))
+            set("persona", e.target.value === "" ? "" : Number(e.target.value))
           }
           options={[
-            { value: "", label: "(Elegir docente)" },
+            { value: "", label: "(Elegir persona)" },
             ...docentes.map((d) => ({ value: d.id, label: d.label })),
           ]}
           helperText={
@@ -463,7 +463,7 @@ export const DesignacionForm: React.FC<{
 
 /** Convierte el estado del formulario en el body que espera la API. */
 export const aPayload = (v: DesignacionPayload) => ({
-  docente: v.docente,
+  persona: v.persona,
   tipo: v.tipo,
   tipo_cargo: v.tipo_cargo || null,
   codigo_cargo: v.codigo_cargo || null,

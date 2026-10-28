@@ -36,8 +36,8 @@ class Seguimiento(BaseModel):
         ('baja', 'Baja'),
     ]
 
-    docente = models.ForeignKey(
-        'Docente', on_delete=models.CASCADE, related_name='seguimientos')
+    persona = models.ForeignKey(
+        'Persona', on_delete=models.CASCADE, related_name='seguimientos')
     tipo = models.CharField(max_length=25, choices=TIPO_CHOICES, default='otro')
     descripcion = models.TextField(
         help_text='Qué hay que hacer, ej. "revisar cobro de sueldo".')
@@ -63,7 +63,7 @@ class Seguimiento(BaseModel):
         return self.estado_seguimiento in ('pendiente', 'en_curso')
 
     def __str__(self):
-        quien = self.docente.persona.apellido if self.docente_id else '—'
+        quien = self.persona.apellido if self.persona_id else '—'
         return f'{quien}: {self.descripcion[:40]} ({self.fecha_novedad})'
 
     class Meta:
@@ -71,5 +71,5 @@ class Seguimiento(BaseModel):
         verbose_name = 'Seguimiento'
         verbose_name_plural = 'Seguimientos'
         indexes = [
-            models.Index(fields=['docente', 'estado_seguimiento']),
+            models.Index(fields=['persona', 'estado_seguimiento']),
         ]

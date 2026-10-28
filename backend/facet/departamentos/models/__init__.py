@@ -2,7 +2,6 @@ from .persona import Persona
 from .jefe import Jefe
 from .departamento import Departamento
 from .director import Director
-from .docente import Docente
 from .noDocente import NoDocente
 from .resolucion import Resolucion
 from .jefeDepartamento import JefeDepartamento

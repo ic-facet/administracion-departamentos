@@ -5,7 +5,7 @@ from .base import BaseModel
 
 
 class Designacion(BaseModel):
-    """Evento de designación de un docente en un cargo.
+    """Evento de designación de una persona en un cargo.
 
     Es la unidad de información que hoy vive como texto libre en las columnas
     CON / EA / DI_GENUINO / DI_NO_GENUINO / Prórroga de la planilla de planta.
@@ -82,8 +82,8 @@ class Designacion(BaseModel):
     ]
 
     # ---- campos -----------------------------------------------------------
-    docente = models.ForeignKey(
-        'Docente', on_delete=models.CASCADE, related_name='designaciones')
+    persona = models.ForeignKey(
+        'Persona', on_delete=models.CASCADE, related_name='designaciones')
     tipo = models.CharField(max_length=25, choices=TIPO_CHOICES)
 
     cargo_departamento = models.ForeignKey(
@@ -194,7 +194,7 @@ class Designacion(BaseModel):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        quien = self.docente.persona.apellido if self.docente_id else '—'
+        quien = self.persona.apellido if self.persona_id else '—'
         cod = f' #{self.codigo_cargo}' if self.codigo_cargo else ''
         return f'{self.get_tipo_display()}{cod} · {quien} ({self.fecha_desde or "s/f"})'
 
@@ -203,7 +203,7 @@ class Designacion(BaseModel):
         verbose_name = 'Designación'
         verbose_name_plural = 'Designaciones'
         indexes = [
-            models.Index(fields=['docente', 'codigo_cargo']),
+            models.Index(fields=['persona', 'codigo_cargo']),
             models.Index(fields=['tipo']),
             models.Index(fields=['fecha_desde']),
         ]

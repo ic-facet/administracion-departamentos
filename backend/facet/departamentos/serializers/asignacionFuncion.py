@@ -4,14 +4,14 @@ from ..models import AsignacionFuncion
 
 
 class AsignacionFuncionSerializer(serializers.ModelSerializer):
-    docente_detalle = serializers.SerializerMethodField()
+    persona_detalle = serializers.SerializerMethodField()
     area_detalle = serializers.SerializerMethodField()
     departamento_detalle = serializers.SerializerMethodField()
 
     class Meta:
         model = AsignacionFuncion
         fields = [
-            'id', 'docente', 'docente_detalle', 'descripcion',
+            'id', 'persona', 'persona_detalle', 'descripcion',
             'departamento', 'departamento_detalle',
             'area', 'area_detalle',
             'resolucion', 'expediente',
@@ -21,12 +21,12 @@ class AsignacionFuncionSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['fecha_creacion', 'fecha_modificacion']
 
-    def get_docente_detalle(self, obj):
-        if not obj.docente_id:
+    def get_persona_detalle(self, obj):
+        if not obj.persona_id:
             return None
-        p = obj.docente.persona
+        p = obj.persona
         return {
-            'id': obj.docente.id,
+            'id': p.id,
             'nombre': p.nombre,
             'apellido': p.apellido,
             'dni': p.dni,

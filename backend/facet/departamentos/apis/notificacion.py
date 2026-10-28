@@ -110,7 +110,7 @@ class NotificacionViewSet(viewsets.ModelViewSet):
             persona = Persona.objects.get(id=persona_id)
             
             # Validar que la asignatura del docente existe
-            asignatura_docente = AsignaturaDocente.objects.get(docente__persona__id=persona_id)
+            asignatura_docente = AsignaturaDocente.objects.get(persona__id=persona_id)
 
             if not persona.email:
                 return Response({"error": "La persona no tiene un correo registrado"}, status=status.HTTP_400_BAD_REQUEST)

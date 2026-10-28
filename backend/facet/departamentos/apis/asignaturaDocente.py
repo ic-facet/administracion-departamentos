@@ -21,14 +21,14 @@ class AsignaturaDocenteViewSet(viewsets.ModelViewSet):
         'dedicacion': ['exact'],
         'cargo_departamento': ['exact'],
         'cargo_departamento__departamento': ['exact'],
-        'docente__persona__legajo': ['icontains'],
-        'docente__persona__apellido': ['icontains'],
-        'docente__persona__nombre': ['icontains'],
-        'docente__persona__dni': ['icontains'],
+        'persona__legajo': ['icontains'],
+        'persona__apellido': ['icontains'],
+        'persona__nombre': ['icontains'],
+        'persona__dni': ['icontains'],
         'asignatura__nombre': ['icontains'],
         'resolucion__nresolucion': ['icontains'],
     }
-    search_fields = ['docente__persona__nombre', 'docente__persona__apellido', 'asignatura__nombre']
+    search_fields = ['persona__nombre', 'persona__apellido', 'asignatura__nombre']
 
     def get_serializer_class(self):
         # Verificar si la solicitud está disponible
@@ -50,7 +50,7 @@ class AsignaturaDocenteViewSet(viewsets.ModelViewSet):
         o si se filtra explícitamente por estado
         """
         queryset = AsignaturaDocente.objects.select_related(
-            'docente__persona', 'asignatura', 'resolucion',
+            'persona', 'asignatura', 'resolucion',
             'cargo_departamento__departamento', 'cargo_departamento__asignatura',
         ).all()
         
@@ -68,11 +68,11 @@ class AsignaturaDocenteViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='list_detalle')
     def list_detalle(self, request):
         """
-        Devuelve los datos de AsignaturaDocente con los datos completos del docente y su persona, 
+        Devuelve los datos de AsignaturaDocente con los datos completos de la persona, 
         incluyendo fecha de inicio y fecha de vencimiento.
         """
         queryset = AsignaturaDocente.objects.select_related(
-            'docente__persona', 'asignatura', 'resolucion',
+            'persona', 'asignatura', 'resolucion',
             'cargo_departamento__departamento', 'cargo_departamento__asignatura',
             'cargo_departamento__cargo',
         ).filter(asignatura__id=request.query_params.get('asignatura'))
@@ -100,16 +100,13 @@ class AsignaturaDocenteViewSet(viewsets.ModelViewSet):
                 'fecha_de_inicio': asignatura_docente.fecha_de_inicio,
                 'fecha_de_vencimiento': asignatura_docente.fecha_de_vencimiento,
                 'notificado': asignatura_docente.notificado,
-                'docente': {
-                    'id': asignatura_docente.docente.id,
-                    'persona': {
-                        'id': asignatura_docente.docente.persona.id,
-                        'nombre': asignatura_docente.docente.persona.nombre,
-                        'apellido': asignatura_docente.docente.persona.apellido,
-                        'dni': asignatura_docente.docente.persona.dni,
-                        'estado': asignatura_docente.docente.persona.estado,
-                        'email': asignatura_docente.docente.persona.email,
-                    },
+                'persona': {
+                    'id': asignatura_docente.persona.id,
+                    'nombre': asignatura_docente.persona.nombre,
+                    'apellido': asignatura_docente.persona.apellido,
+                    'dni': asignatura_docente.persona.dni,
+                    'estado': asignatura_docente.persona.estado,
+                    'email': asignatura_docente.persona.email,
                 },
             }
             for asignatura_docente in queryset
@@ -126,7 +123,7 @@ class AsignaturaDocenteViewSet(viewsets.ModelViewSet):
         fecha_limite = now() + timedelta(days=dias_limite)
 
         queryset = AsignaturaDocente.objects.select_related(
-            'docente__persona', 'cargo_departamento__cargo',
+            'persona', 'cargo_departamento__cargo',
         ).filter(
             fecha_de_vencimiento__lte=fecha_limite,
             fecha_de_vencimiento__gte=now()
@@ -154,14 +151,11 @@ class AsignaturaDocenteViewSet(viewsets.ModelViewSet):
                 'fecha_de_inicio': asignatura_docente.fecha_de_inicio,  # Agregar este campo
                 'fecha_de_vencimiento': asignatura_docente.fecha_de_vencimiento,
                 'notificado': asignatura_docente.notificado,
-                'docente': {
-                    'id': asignatura_docente.docente.id,
-                    'persona': {
-                        'id': asignatura_docente.docente.persona.id,
-                        'nombre': asignatura_docente.docente.persona.nombre,
-                        'apellido': asignatura_docente.docente.persona.apellido,
-                        'dni': asignatura_docente.docente.persona.dni,
-                    },
+                'persona': {
+                    'id': asignatura_docente.persona.id,
+                    'nombre': asignatura_docente.persona.nombre,
+                    'apellido': asignatura_docente.persona.apellido,
+                    'dni': asignatura_docente.persona.dni,
                 },
             }
             for asignatura_docente in queryset

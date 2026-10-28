@@ -62,13 +62,7 @@ const EditarDocenteAsignatura: React.FC = () => {
     email: string;
   }
 
-  interface Docente {
-    id: number;
-    persona: number;
-    persona_detalle: PersonaDetalle | null;
-    observaciones: string;
-    estado: 0 | 1;
-  }
+  type Docente = PersonaDetalle;
 
   const [persona, setPersona] = useState<Docente | null>(null);
   const [asignatura, setAsignatura] = useState<string>("");
@@ -93,7 +87,7 @@ const EditarDocenteAsignatura: React.FC = () => {
       const response = await API.get(`/facet/asignatura-docente/${id}/`);
       const data = response.data;
 
-      setPersona(data.docente);
+      setPersona(data.persona);
       setAsignatura(data.asignatura.nombre);
       setResolucion(data.resolucion);
       setObservaciones(data.observaciones);
@@ -116,7 +110,7 @@ const EditarDocenteAsignatura: React.FC = () => {
 
     const updatedDocenteAsignatura = {
       asignatura: idAsignatura,
-      docente: persona.id,
+      persona: persona.id,
       resolucion: resolucion.id,
       observaciones,
       estado,
@@ -146,8 +140,8 @@ const EditarDocenteAsignatura: React.FC = () => {
           <FormField
             label="Nombre y Apellido del Docente"
             value={
-              persona?.persona_detalle
-                ? `${persona.persona_detalle.nombre} ${persona.persona_detalle.apellido}`
+              persona
+                ? `${persona.nombre} ${persona.apellido}`
                 : ""
             }
             disabled

@@ -2,7 +2,6 @@ from .persona import PersonaSerializer
 from .jefe import JefeSerializer
 from .departamento import DepartamentoSerializer
 from .director import DirectorSerializer
-from .docente import DocenteSerializer
 from .noDocente import NoDocenteSerializer
 from .resolucion import ResolucionSerializer
 from .jefeDepartamento import JefeDepartamentoSerializer,JefeDepartamentoCreateSerializer,JefeDepartamentoDetailSerializer

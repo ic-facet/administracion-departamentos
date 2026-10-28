@@ -78,7 +78,7 @@ class CargoDepartamentoSerializer(serializers.ModelSerializer):
     def get_ocupacion_actual(self, obj):
         """Período vigente del ocupante (docente/no_docente) o el último."""
         qs = obj.historial.filter(estado='1').select_related(
-            'docente__persona', 'no_docente__persona')
+            'persona', 'no_docente__persona')
         actual = qs.filter(fecha_fin__isnull=True).order_by('-fecha_inicio').first()
         if not actual:
             actual = qs.order_by('-fecha_inicio').first()
@@ -87,11 +87,11 @@ class CargoDepartamentoSerializer(serializers.ModelSerializer):
 
         ocupante = None
         rol = None
-        if actual.docente:
-            p = actual.docente.persona
+        if actual.persona:
+            p = actual.persona
             rol = 'docente'
             ocupante = {
-                'id': actual.docente.id,
+                'id': actual.persona.id,
                 'nombre': p.nombre,
                 'apellido': p.apellido,
                 'dni': p.dni,

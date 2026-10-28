@@ -55,8 +55,8 @@ class AsignaturaDocente(BaseModel):
     asignatura = models.ForeignKey(
         'Asignatura', models.CASCADE)
 
-    docente = models.ForeignKey(
-        'Docente', models.CASCADE)
+    persona = models.ForeignKey(
+        'Persona', models.CASCADE)
     
     resolucion = models.ForeignKey(
         'Resolucion', models.CASCADE)
